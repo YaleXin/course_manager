@@ -6,6 +6,8 @@ Vue.use(VueRouter)
 const Main = () => import('../components/Main.vue')
 const Subject = () => import('../components/Subject.vue')
 const Progress = () => import('../components/Progress.vue')
+const Team = () => import('../components/Team.vue')
+const Login = () => import('../components/Login.vue')
 
 const routes = [
     {
@@ -15,14 +17,42 @@ const routes = [
     {
         path: '/main',
         component: Main,
+        beforeEnter: (to, from, next) => {
+            console.log('进入main');
+            next();
+        }
     },
     {
         path: '/subject',
         component: Subject,
+        beforeEnter: (to, from, next) => {
+            console.log('进入subject');
+            next();
+        }
     },
     {
         path: '/progress',
         component: Progress,
+        beforeEnter: (to, from, next) => {
+            console.log('进入progress');
+            next();
+        }
+    },
+    {
+        path: '/team',
+        component: Team,
+        beforeEnter: (to, from, next) => {
+            console.log('进入team');
+            next();
+        }
+    },
+    {
+        path: '/login',
+        component: Login,
+        beforeEnter: (to, from, next) => {
+            console.log('进入登陆');
+            next();
+        }
     },
 ];
 
@@ -30,5 +60,4 @@ const router = new VueRouter({
     routes,
     mode: 'history'
 })
-
 export default router

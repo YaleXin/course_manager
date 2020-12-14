@@ -1,46 +1,100 @@
 <template>
-  <div class="">
-    <el-menu
-      :default-active="activeIndex"
-      class="el-menu-demo"
-      mode="horizontal"
-      @select="handleSelect"
-    >
-      <el-menu-item index="1">首页</el-menu-item>
-      <el-menu-item index="2">题目</el-menu-item>
-      <el-menu-item index="3">进展</el-menu-item>
-    </el-menu>
+  <div class="navigation">
+    <el-row type="flex" justify="center">
+      <el-col :span="4" @click.native="itemClick(1)">
+        <span :class="{ active: activeIndexByRoute == 1 }" class="item"
+          ><i class="el-icon-menu"></i>首页</span
+        >
+      </el-col>
+      <el-col :span="4" @click.native="itemClick(2)">
+        <span :class="{ active: activeIndexByRoute == 2 }"
+          ><i class="el-icon-document-copy"></i>题目</span
+        >
+      </el-col>
+      <el-col :span="4" @click.native="itemClick(3)">
+        <span :class="{ active: activeIndexByRoute == 3 }"
+          ><i class="el-icon-data-line"></i>进展</span
+        >
+      </el-col>
+      <el-col :span="4" @click.native="itemClick(4)">
+        <span :class="{ active: activeIndexByRoute == 4 }"
+          ><i class="el-icon-s-check"></i>团队</span
+        >
+      </el-col>
+      <el-col :span="4">
+        <user v-if="isLogin"></user>
+        <span v-else
+          ><el-link type="info" style="font-size: 20px" @click="loginClick">请登录</el-link></span
+        >
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
+import User from "./User";
 export default {
   name: "Navigation",
-  components: {},
+  components: { User },
   data() {
     return {
-      activeIndex: "1",
+      activeIndex: 1,
     };
   },
   mounted() {},
   methods: {
-    handleSelect(key, keyPath) {
-      switch (key) {
-        case "1":
-          this.$router.replace("/main").catch((err) => {});
+    itemClick(index) {
+      // this.activeIndex = index;
+      switch (index) {
+        case 1:
+          this.$router.replace("/main").catch((e) => {});
           break;
-        case "2":
-          this.$router.replace("/subject").catch((err) => {});
+        case 2:
+          this.$router.replace("/subject").catch((e) => {});
           break;
-        case "3":
-          this.$router.replace("/progress").catch((err) => {});
+        case 3:
+          this.$router.replace("/progress").catch((e) => {});
+          break;
+        case 4:
+          this.$router.replace("/team").catch((e) => {});
           break;
         default:
-          this.$router.replace("/main").catch((err) => {});
       }
-      console.log(key);
+    },
+    loginClick() {
+      this.$router.replace("/login").catch((e) => {});
+    },
+  },
+  computed: {
+    activeIndexByRoute() {
+      if (this.$route.path.indexOf("/main") != -1) return 1;
+      else if (this.$route.path.indexOf("/subject") != -1) return 2;
+      else if (this.$route.path.indexOf("/progress") != -1) return 3;
+      else if (this.$route.path.indexOf("/team") != -1) return 4;
+      return 1;
+    },
+    isLogin() {
+      return this.$store.state.isLogin;
     },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.active {
+  color: rgb(64, 158, 255);
+  border-bottom: 1px solid rgb(64, 158, 255);
+}
+.navigation {
+  font-size: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  box-shadow: -1px -1px 100px teal;
+}
+.item {
+  /* margin-left: 10px;
+  margin-right: 10px; */
+  /* padding-left: 10px;
+  padding-right: 10px; */
+}
+</style>
