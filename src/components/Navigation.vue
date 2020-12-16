@@ -31,7 +31,7 @@
   </div>
 </template>
 <script>
-import User from "./User";
+import User from "./User.vue";
 export default {
   name: "Navigation",
   components: { User },
@@ -70,7 +70,7 @@ export default {
       else if (this.$route.path.indexOf("/subject") != -1) return 2;
       else if (this.$route.path.indexOf("/progress") != -1) return 3;
       else if (this.$route.path.indexOf("/team") != -1) return 4;
-      return 1;
+      return 0;
     },
     isLogin() {
       return this.$store.state.isLogin;

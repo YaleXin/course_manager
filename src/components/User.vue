@@ -2,11 +2,15 @@
   <div class="">
     <el-dropdown @command="handleCommand">
       <span class="el-dropdown-link">
-        {{ user.userName }}<i class="el-icon-arrow-down el-icon--right"></i>
+        {{ user.nickname }}<i class="el-icon-arrow-down el-icon--right"></i>
       </span>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item icon="el-icon-setting" command="changeInfo">修改信息</el-dropdown-item>
-        <el-dropdown-item icon="el-icon-delete" command="logout">注销</el-dropdown-item>
+        <el-dropdown-item icon="el-icon-setting" command="changeInfo"
+          >修改信息</el-dropdown-item
+        >
+        <el-dropdown-item icon="el-icon-delete" command="logout"
+          >注销</el-dropdown-item
+        >
       </el-dropdown-menu>
     </el-dropdown>
   </div>
@@ -18,17 +22,25 @@ export default {
   data() {
     return {
       user: {
-        userName: "黄阿信",
-        isCaptain: true,
+        username: "",
+        nickname: "",
+        role: "",
       },
     };
   },
-  mounted() {},
+  mounted() {
+    const storeUser = this.$store.state.user;
+    this.user = storeUser;
+  },
   methods: {
     handleCommand(command) {
-      this.$message("click on item " + command);
       console.log(command);
-      if (command == 'logout')this.$store.commit('userLogout', this.user);
+      if (command == "logout") {
+        this.$store.commit("userLogout", this.user);
+        this.$message("注销成功！");
+      } else if (command == "changeInfo") {
+        this.$router.push("modify");
+      }
     },
   },
 };

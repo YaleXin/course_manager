@@ -7,6 +7,11 @@ const store = new Vuex.Store({
   state: {
     navagationIndex: 1,
     isLogin: false,
+    user: {
+      username: '',
+      nickname: '',
+      role: '',
+    },
   },
   mutations: {
     changeIndex (state, newIndex) {
@@ -14,7 +19,12 @@ const store = new Vuex.Store({
     },
     userLogout (state, user) {
       state.isLogin = false;
-    }
+      state.user = {};
+    },
+    saveUser(state, user) {
+      state.user = user;
+      state.isLogin = true;
+    },
   }
 })
 

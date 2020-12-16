@@ -8,6 +8,7 @@ const Subject = () => import('../components/Subject.vue')
 const Progress = () => import('../components/Progress.vue')
 const Team = () => import('../components/Team.vue')
 const Login = () => import('../components/Login.vue')
+const InfoForm = () => import('../components/InfoForm.vue')
 
 const routes = [
     {
@@ -49,6 +50,14 @@ const routes = [
     {
         path: '/login',
         component: Login,
+        beforeEnter: (to, from, next) => {
+            console.log('进入登陆');
+            next();
+        }
+    },
+    {
+        path: '/modify',
+        component: InfoForm,
         beforeEnter: (to, from, next) => {
             console.log('进入登陆');
             next();
