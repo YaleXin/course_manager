@@ -1,17 +1,21 @@
 // vue.config.js
-module.export={
+module.exports = {
+
     devServer: {
-          proxy: {
-                '/proxy':{
-                      target: 'http:// your.proxy.site', // 
-                      ws: true, // websockets
-                      changeOrigin: true,  // needed for virtual hosted sites
-                      pathRewrite: {
-                            '^/proxy': ''
-                      }
+        port: 8081,
+        proxy: {
+            '/testJson4servlet': {
+
+                target: 'http://localhost:8080/testJson4servlet/',
+                ws: false,
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/testJson4servlet': '',
                 }
-          }
+            }
+        },
+        disableHostCheck: true,
     }
-  
+
 }
 
