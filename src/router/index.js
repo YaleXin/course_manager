@@ -9,6 +9,7 @@ const Progress = () => import('../components/Progress.vue')
 const Team = () => import('../components/Team.vue')
 const Login = () => import('../components/Login.vue')
 const InfoForm = () => import('../components/InfoForm.vue')
+const InputSubject = () => import('../components/InputSubject.vue')
 
 const routes = [
     {
@@ -59,7 +60,15 @@ const routes = [
         path: '/modify',
         component: InfoForm,
         beforeEnter: (to, from, next) => {
-            console.log('进入登陆');
+            console.log('进入修改');
+            next();
+        }
+    },
+    {
+        path: '/addSubject',
+        component: InputSubject,
+        beforeEnter: (to, from, next) => {
+            console.log('进入添加题目');
             next();
         }
     },

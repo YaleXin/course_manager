@@ -6,6 +6,9 @@
       <el-table-column prop="finished" label="完成人数"> </el-table-column>
       <el-table-column prop="copyright" label="题目提供人"> </el-table-column>
     </el-table>
+    <el-button type="success" @click="tryAddSubject" plain id="add-btn"
+      >添加题目</el-button
+    >
   </div>
 </template>
 <script>
@@ -21,9 +24,16 @@ export default {
     };
   },
   mounted() {},
-  methods: {},
+  methods: {
+    tryAddSubject() {
+      this.$router.push("/addSubject").catch((e) => {});
+    },
+  },
 };
 </script>
 
 <style scoped>
+#add-btn {
+  margin-top: 10px;
+}
 </style>
