@@ -37,6 +37,7 @@
             v-model="ruleForm.password"
             show-password
             class="inputItem"
+            @keydown.enter.native="submitForm('ruleForm')"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -63,6 +64,11 @@ export default {
   components: {},
   data() {
     return {
+      loginKey: {
+        prefixKey: "",
+        suffixKey: "",
+      },
+
       ruleForm: {
         username: "",
         password: "",
@@ -70,37 +76,86 @@ export default {
       rules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
+          { whitespace: true, message: "请输入非空用户名", trigger: "blur" },
         ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { whitespace: true, message: "请输入非空密码", trigger: "blur" },
+        ],
       },
     };
   },
-  mounted() {},
+  mounted() {
+    this.$axios.get("/beforeLogin").then((res) => {
+      console.log(res);
+      this.loginKey.prefixKey = res.data.prefixKey;
+      this.loginKey.suffixKey = res.data.suffixKey;
+    });
+  },
   methods: {
     loginClick() {
       console.log("登陆");
     },
+    loginSuccess(resp) {
+      this.$message({
+        message: "登陆成功",
+        showClose: true,
+        type: "success",
+      });
+      this.$store.commit("saveUser", resp.data.user);
+      this.$router.replace("/main").catch(() => {});
+    },
+    loginFail() {
+      this.$message({
+        showClose: true,
+        message: "登陆失败，请稍后再试",
+        type: "error",
+      });
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          console.log(typeof this.ruleForm.username);
+          //向后台发送登陆表单
+          this.$axios
+            .post("/login", {
+              // url: "/mlogin",
+              // method: "post",
+              data: {
+                username: this.trimTwo(this.ruleForm.username),
+                password:
+                  this.loginKey.prefixKey +
+                  this.trimTwo(this.ruleForm.password) +
+                  this.loginKey.suffixKey,
+              },
+            })
+            .then((resp) => {
+              console.log(resp);
+              this.loginSuccess(resp);
+            })
+            .catch((error) => {
+              console.log(error);
+              this.loginFail();
+            });
+          // http://localhost:8081/testJson4servlet/login
+          // http://localhost:8081/testJson4servlet/beforeLogin
           //  模拟登陆成功
           //   alert("submit!");
-          const user = {
-            username: this.ruleForm.username,
-            nickname: this.ruleForm.username + "的昵称",
-            role: "captain",
-          };
-          this.$store.commit("saveUser", user);
-          this.$router.replace("/main").catch(() => {});
-          this.$message({
-            message: "登陆成功",
-            type: "success",
-          });
+          // const user = {
+          //   username: this.ruleForm.username,
+          //   nickname: this.ruleForm.username + "的昵称",
+          //   role: "captain",
+          // };
+          // this.$store.commit("saveUser", user);
+          // this.$router.replace("/main").catch(() => {});
         } else {
           console.log("error submit!!");
           return false;
         }
       });
+    },
+    trimTwo(str) {
+      return str.replace(/^\s+/, "").replace(/\s+$/, "");
     },
   },
 };

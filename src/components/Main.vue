@@ -1,8 +1,5 @@
 <template>
-  <div class="">
-    首页
-    <button @click="beforeLogin">请求随机密钥</button>
-  </div>
+  <div class="">首页</div>
 </template>
 <script>
 export default {
@@ -12,13 +9,7 @@ export default {
     return {};
   },
   mounted() {},
-  methods: {
-    beforeLogin() {
-      this.$axios.get("/testJson4servlet/beforeLogin").then((res) => {
-        console.log(res);
-      });
-    },
-  },
+  methods: {},
 };
 </script>
 

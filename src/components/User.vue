@@ -8,9 +8,7 @@
         <el-dropdown-item icon="el-icon-setting" command="changeInfo"
           >修改信息</el-dropdown-item
         >
-        <el-dropdown-item icon="el-icon-delete" command="logout"
-          >注销</el-dropdown-item
-        >
+        <el-dropdown-item icon="el-icon-delete" command="logout">注销</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
   </div>
@@ -38,6 +36,7 @@ export default {
       if (command == "logout") {
         this.$store.commit("userLogout", this.user);
         this.$message("注销成功！");
+        this.$router.replace("/main").catch(() => {});
       } else if (command == "changeInfo") {
         this.$router.push("modify");
       }
