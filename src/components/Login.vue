@@ -1,26 +1,6 @@
 <template>
   <div class="loginDialog">
     <div class="content">
-      <!-- <el-input
-        placeholder="请输入用户名"
-        prefix-icon="el-icon-user-solid"
-        v-model="username"
-        class="inputItem"
-      ></el-input>
-      <el-input
-        prefix-icon="el-icon-warning-outline"
-        placeholder="请输入密码"
-        v-model="password"
-        show-password
-        class="inputItem"
-      ></el-input>
-      <div class="btnDiv">
-        <el-button @click="loginClick" style="margin-top: 20px" plain round size="small" type="primary" icon="el-icon-thumb"
-          >登陆</el-button
-        >
-      </div>
-    </div> -->
-
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
         <el-form-item prop="username">
           <el-input
@@ -119,8 +99,6 @@ export default {
           //向后台发送登陆表单
           this.$axios
             .post("/login", {
-              // url: "/mlogin",
-              // method: "post",
               data: {
                 username: this.trimTwo(this.ruleForm.username),
                 password:
@@ -137,23 +115,13 @@ export default {
               console.log(error);
               this.loginFail();
             });
-          // http://localhost:8081/testJson4servlet/login
-          // http://localhost:8081/testJson4servlet/beforeLogin
-          //  模拟登陆成功
-          //   alert("submit!");
-          // const user = {
-          //   username: this.ruleForm.username,
-          //   nickname: this.ruleForm.username + "的昵称",
-          //   role: "captain",
-          // };
-          // this.$store.commit("saveUser", user);
-          // this.$router.replace("/main").catch(() => {});
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
+    // 去除首尾空格
     trimTwo(str) {
       return str.replace(/^\s+/, "").replace(/\s+$/, "");
     },
