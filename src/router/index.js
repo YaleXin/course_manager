@@ -10,6 +10,8 @@ const Team = () => import('../components/Team.vue')
 const Login = () => import('../components/Login.vue')
 const InfoForm = () => import('../components/InfoForm.vue')
 const InputSubject = () => import('../components/InputSubject.vue')
+const AdminLogin = () => import('../components/AdminLogin.vue')
+const AdminIndex = () => import('../components/AdminIndex.vue')
 
 const routes = [
     {
@@ -71,6 +73,22 @@ const routes = [
             console.log('进入添加题目');
             next();
         }
+    },
+    {
+        path: '/admin',
+        component: AdminLogin,
+        beforeEnter: (to, from, next) => {
+            console.log('进入管理员登陆');
+            next();
+        },
+    },
+    {
+        path: '/adminIndex',
+        component: AdminIndex,
+        beforeEnter: (to, from, next) => {
+            console.log('进入管理员首页');
+            next();
+        },
     },
 ];
 

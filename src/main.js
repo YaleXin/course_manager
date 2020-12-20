@@ -13,7 +13,7 @@ Vue.prototype.$axios = Axios;
 Vue.config.productionTip = false
 Axios.defaults.withCredentials = true;
 Axios.defaults.baseURL = '/testJson4servlet';
-new Vue({
+var vmm = new Vue({
   render: h => h(App),
   router: Router,
   store: Store,
