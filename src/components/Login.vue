@@ -21,6 +21,17 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
+          <el-switch
+            style="display: block"
+            v-model="ruleForm.isStudent"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="我是学生"
+            inactive-text="我是教师"
+          >
+          </el-switch>
+        </el-form-item>
+        <el-form-item>
           <div class="btnDiv">
             <el-button
               @click="submitForm('ruleForm')"
@@ -52,6 +63,7 @@ export default {
       ruleForm: {
         username: "",
         password: "",
+        isStudent: true,
       },
       rules: {
         username: [
@@ -85,10 +97,10 @@ export default {
       this.$store.commit("saveUser", resp.data.user);
       this.$router.replace("/main").catch(() => {});
     },
-    loginFail() {
+    loginFail(msg = "") {
       this.$message({
         showClose: true,
-        message: "登陆失败，请稍后再试",
+        message: "登陆失败，请稍后再试， 失败原因：" + msg,
         type: "error",
       });
     },
@@ -105,14 +117,17 @@ export default {
                   this.loginKey.prefixKey +
                   this.trimTwo(this.ruleForm.password) +
                   this.loginKey.suffixKey,
+                isStudent: this.ruleForm.isStudent,
               },
             })
             .then((resp) => {
-              console.log(resp);
-              this.loginSuccess(resp);
+              if (resp.data.loginSuccess) {
+                this.loginSuccess(resp);
+              } else {
+                this.loginFail(resp.data.error);
+              }
             })
             .catch((error) => {
-              console.log(error);
               this.loginFail();
             });
         } else {

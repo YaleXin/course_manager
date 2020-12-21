@@ -11,16 +11,18 @@
       <el-form-item label="原密码" prop="oldPass">
         <el-input
           type="password"
+          show-password
           v-model="ruleForm.oldPass"
           auto-complete="off"
         ></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="pass">
-        <el-input type="password" v-model="ruleForm.pass" auto-complete="off"></el-input>
+        <el-input show-password type="password" v-model="ruleForm.pass" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="checkPass">
         <el-input
           type="password"
+          show-password
           v-model="ruleForm.checkPass"
           auto-complete="off"
         ></el-input>
@@ -31,6 +33,8 @@
             type="date"
             placeholder="选择日期"
             v-model="ruleForm.birthday"
+            value-format="timestamp"
+            format="yyyy 年 MM 月 dd 日"
             style="width: 100%"
           ></el-date-picker>
         </el-form-item>
@@ -89,11 +93,23 @@ export default {
       },
     };
   },
-  mounted() {},
+  mounted() {
+    this.ruleForm.birthday = this.$store.state.user.birthday;
+  },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+
+          this.$axios.post('/modifyStudent.st' , {
+            data: {
+              id: this.$store.state.user.id,
+              oldPass: this.ruleForm.oldPass,
+              newPass: this.ruleForm.pass,
+              birthday: this.ruleForm.birthday / 1000,
+            }
+          })
+
           alert("submit!");
         } else {
           console.log("error submit!!");

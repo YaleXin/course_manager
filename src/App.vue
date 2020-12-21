@@ -28,6 +28,23 @@ export default {
     Navigation,
     MyFooter,
   },
+  created() {
+    this.$axios
+      .get("/getUserSession")
+      .then((res) => {
+        console.log(res);
+        if (res.data.logined) {
+          this.$store.commit("saveUser", res.data.user);
+        } 
+      })
+      .catch((error) => {
+        this.$message({
+          showClose: true,
+          message: "数据请求失败，请稍后再试",
+          type: "error",
+        });
+      });
+  },
 };
 </script>
 

@@ -39,14 +39,18 @@ export default {
             this.$router.replace("/admin").catch((e) => {});
           }
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.log("error!");
+          console.log(error);
+          this.$router.replace("/admin").catch(() => {});
+        });
     }
   },
   mounted() {},
   methods: {
     logout() {
       this.$axios
-        .post("/logout.admin")
+        .delete("/logout.admin")
         .then((resp) => {
           this.$message({
             showClose: true,

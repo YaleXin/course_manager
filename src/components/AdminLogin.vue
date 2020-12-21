@@ -92,7 +92,13 @@ export default {
         } else {
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        this.$message({
+          showClose: true,
+          message: "数据请求失败，请稍后再试",
+          type: "error",
+        });
+      });
   },
   methods: {
     loginSuccess(resp) {
