@@ -17,7 +17,12 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="pass">
-        <el-input show-password type="password" v-model="ruleForm.pass" auto-complete="off"></el-input>
+        <el-input
+          show-password
+          type="password"
+          v-model="ruleForm.pass"
+          auto-complete="off"
+        ></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="checkPass">
         <el-input
@@ -41,7 +46,9 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')"
+          >提交</el-button
+        >
         <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
     </el-form>
@@ -72,6 +79,10 @@ export default {
       }
     };
     return {
+      loginKey: {
+        prefixKey: "",
+        suffixKey: "",
+      },
       ruleForm: {
         oldPass: "",
         pass: "",
@@ -95,22 +106,43 @@ export default {
   },
   mounted() {
     this.ruleForm.birthday = this.$store.state.user.birthday;
+    // 在这里偷个懒，两个密码使用同一个密钥
+    this.$axios.get("/beforeLogin").then((res) => {
+      console.log(res);
+      this.loginKey.prefixKey = res.data.prefixKey;
+      this.loginKey.suffixKey = res.data.suffixKey;
+    });
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.$axios
+            .post("/modifyStudent.st", {
+              data: {
+                id: this.$store.state.user.id,
+                oldPass:
+                  this.loginKey.prefixKey +
+                  this.trimTwo(this.ruleForm.oldPass) +
+                  this.loginKey.suffixKey,
 
-          this.$axios.post('/modifyStudent.st' , {
-            data: {
-              id: this.$store.state.user.id,
-              oldPass: this.ruleForm.oldPass,
-              newPass: this.ruleForm.pass,
-              birthday: this.ruleForm.birthday / 1000,
-            }
-          })
-
-          alert("submit!");
+                // this.ruleForm.oldPass,
+                newPass:
+                  this.loginKey.prefixKey +
+                  this.trimTwo(this.ruleForm.pass) +
+                  this.loginKey.suffixKey,
+                // this.ruleForm.pass,
+                birthday: this.ruleForm.birthday,
+              },
+            })
+            .then((resp) => {
+              if(resp.data.updated){
+                this.modifySuccess();
+              }else {
+                this.modifyfaile(resp.data.error);
+              }
+            })
+            .catch((e) => {this.modifyfaile()});
         } else {
           console.log("error submit!!");
           return false;
@@ -119,6 +151,24 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    // 去除首尾空格
+    trimTwo(str) {
+      return str.replace(/^\s+/, "").replace(/\s+$/, "");
+    },
+    modifySuccess() {
+      this.$message({
+        showClose: true,
+        message: "修改密码成功！",
+        type: "success",
+      });
+    },
+    modifyfaile(errorMsg = "") {
+      this.$message({
+        showClose: true,
+        message: "修改失败，请稍后再试， 失败原因：" + errorMsg,
+        type: "error",
+      });
     },
   },
 };
