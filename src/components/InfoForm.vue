@@ -32,7 +32,7 @@
           auto-complete="off"
         ></el-input>
       </el-form-item>
-      <el-form-item label="出生日期">
+      <el-form-item label="出生日期" v-if="this.$store.state.user.birthday">
         <el-form-item prop="birthday">
           <el-date-picker
             type="date"
@@ -79,6 +79,7 @@ export default {
       }
     };
     return {
+      postUrl: "",
       loginKey: {
         prefixKey: "",
         suffixKey: "",
@@ -113,36 +114,41 @@ export default {
       this.loginKey.suffixKey = res.data.suffixKey;
     });
   },
+  created() {
+    if (this.$store.state.user == null || this.$store.state.user.username == null || this.$store.state.user.username == "")this.$router.replace('/login').catch(e => {});
+  },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          if (this.$store.state.user.birthday == null)
+            this.postUrl = "/modifyTeacher.te";
+          else this.postUrl = "/modifyStudent.st";
           this.$axios
-            .post("/modifyStudent.st", {
+            .post(this.postUrl, {
               data: {
                 id: this.$store.state.user.id,
                 oldPass:
                   this.loginKey.prefixKey +
                   this.trimTwo(this.ruleForm.oldPass) +
                   this.loginKey.suffixKey,
-
-                // this.ruleForm.oldPass,
                 newPass:
                   this.loginKey.prefixKey +
                   this.trimTwo(this.ruleForm.pass) +
                   this.loginKey.suffixKey,
-                // this.ruleForm.pass,
                 birthday: this.ruleForm.birthday,
               },
             })
             .then((resp) => {
-              if(resp.data.updated){
+              if (resp.data.updated) {
                 this.modifySuccess();
-              }else {
+              } else {
                 this.modifyfaile(resp.data.error);
               }
             })
-            .catch((e) => {this.modifyfaile()});
+            .catch((e) => {
+              this.modifyfaile();
+            });
         } else {
           console.log("error submit!!");
           return false;

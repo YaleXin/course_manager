@@ -34,6 +34,7 @@ export default {
       .then((res) => {
         console.log(res);
         if (res.data.logined) {
+          console.log(res.data.user.birthday);
           this.$store.commit("saveUser", res.data.user);
         } 
       })

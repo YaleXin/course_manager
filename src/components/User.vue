@@ -36,7 +36,7 @@ export default {
     logout() {
       this.$store.commit("userLogout", this.user);
       this.$axios
-        .delete("/studentLogout")
+        .delete("/userLogout")
         .then((resp) => {
           this.$message({
             showClose: true,
