@@ -36,6 +36,10 @@ export default {
         if (res.data.logined) {
           console.log(res.data.user.birthday);
           this.$store.commit("saveUser", res.data.user);
+          if (res.data.hasTeam){
+            console.log(res.data.team)
+            this.$store.commit("saveTeam", res.data.team);
+          }
         } 
       })
       .catch((error) => {

@@ -13,6 +13,9 @@ const store = new Vuex.Store({
       nickname: '',
       role: '',
     },
+    team: {
+
+    },
     adminUser: {
       id: -1,
       username: "",
@@ -30,6 +33,9 @@ const store = new Vuex.Store({
     saveUser(state, user) {
       state.user = user;
       state.isLogin = true;
+    },
+    saveTeam(state, team){
+      state.team = team;
     },
     adminUserLogout(state) {
       state.adminLogin = false;
