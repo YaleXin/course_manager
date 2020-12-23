@@ -14,7 +14,15 @@ const store = new Vuex.Store({
       role: '',
     },
     team: {
-
+      cap_id: 0,
+      captain: "",
+      fulled: false,
+      id: 0,
+      mem1_id: 0,
+      mem2_id: 0,
+      member1: "",
+      member2:"",
+      su_id: 0,
     },
     adminUser: {
       id: -1,

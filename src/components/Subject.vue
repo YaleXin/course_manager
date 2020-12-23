@@ -1,5 +1,9 @@
 <template>
   <div class="">
+    <el-row type="flex" justify="center" v-show="showMsg">
+      <el-col :span="6"><el-link type="warning" @click.native="textClick">您还没有组队选题噢 点此查看</el-link></el-col>
+    </el-row>
+
     <el-table :data="subjects" stripe style="width: 100%">
       <el-table-column prop="name" label="题目名称" width="180">
         <template slot-scope="scope">
@@ -29,7 +33,7 @@
       width="80%"
       center
     >
-      <pre>{{description}}</pre>
+      <pre>{{ description }}</pre>
       <span slot="footer" class="dialog-footer">
         <el-button @click="centerDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="centerDialogVisible = false"
@@ -45,6 +49,7 @@ export default {
   components: {},
   data() {
     return {
+      showMsg: true,
       programs: [
         { descr: "题目一", selectNum: 10, finished: 5, copyright: "黄阿信" },
         { descr: "题目二", selectNum: 10, finished: 2, copyright: "黄阿信" },
@@ -59,11 +64,19 @@ export default {
         },
       ],
       description: "",
-      centerDialogVisible: false
+      centerDialogVisible: false,
     };
   },
-  mounted() {},
+  mounted() {
+    console.log('this.$store.state.team');
+    console.log(this.$store.state.team);
+    if(this.$store.state.team.su_id === 0)this.showMsg = true;
+    else this.showMsg = false;
+  },
   methods: {
+    textClick() {
+      this.$router.replace("/team").catch(e =>{});
+    },
     tryAddSubject() {
       this.$router.push("/addSubject").catch((e) => {});
     },

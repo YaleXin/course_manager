@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import MyFooter from './components/MyFooter.vue';
+import MyFooter from "./components/MyFooter.vue";
 import Navigation from "./components/Navigation.vue";
 
 export default {
@@ -36,11 +36,13 @@ export default {
         if (res.data.logined) {
           console.log(res.data.user.birthday);
           this.$store.commit("saveUser", res.data.user);
-          if (res.data.hasTeam){
-            console.log(res.data.team)
+          if (res.data.hasTeam) {
             this.$store.commit("saveTeam", res.data.team);
+            console.log(res.data.team);
+            console.log("uvex");
+            console.log(this.$store.state.team);
           }
-        } 
+        }
       })
       .catch((error) => {
         this.$message({

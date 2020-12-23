@@ -123,6 +123,10 @@ export default {
             .then((resp) => {
               if (resp.data.loginSuccess) {
                 this.loginSuccess(resp);
+                if(resp.data.hasTeam){
+                  this.$store.commit("saveTeam", resp.data.team);
+                  console.log(resp.data.team);
+                }
               } else {
                 this.loginFail(resp.data.error);
               }
