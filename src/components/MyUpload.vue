@@ -51,9 +51,11 @@ export default {
     };
   },
   created() {
+    console.log(this.$store.state.team);
     const teamId = this.$store.state.team.id;
+    const studentId = this.$store.state.user.id;
     console.log(teamId);
-    this.upUrl = "/testJson4servlet/upload.st?teamId=" + teamId;
+    this.upUrl = "/testJson4servlet/upload.st?teamId=" + teamId + "&studentId=" + studentId;
   },
   mounted() {
     this.student = this.$store.state.user.id;
@@ -62,6 +64,7 @@ export default {
   computed: {},
   methods: {
     submitUpload() {
+      console.log(this.$refs.upload);
       this.$refs.upload.submit();
     },
     handleRemove(file, fileList) {
