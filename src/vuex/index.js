@@ -28,7 +28,15 @@ const store = new Vuex.Store({
       id: -1,
       username: "",
       password: "",
-    }
+    },
+    notApprovedTeams: [
+      // {
+        // captain: "",
+        // member1: "",
+        // subName: "",
+        // id: -1,
+      // },
+    ]
   },
   mutations: {
     changeIndex(state, newIndex) {
@@ -56,6 +64,9 @@ const store = new Vuex.Store({
     saveAdminUser(state, adminUser) {
       state.adminUser = adminUser;
       state.adminLogin = true;
+    },
+    saveNotApprovedTeams(state, notApprovedTeams){
+      this.notApprovedTeams = notApprovedTeams;
     },
   }
 })

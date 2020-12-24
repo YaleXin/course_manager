@@ -42,6 +42,7 @@ export default {
             console.log("uvex");
             console.log(this.$store.state.team);
           }
+          this.$store.commit("saveNotApprovedTeams", res.data.notApprovedTeams);
         }
       })
       .catch((error) => {

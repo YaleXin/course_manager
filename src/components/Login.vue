@@ -96,6 +96,7 @@ export default {
       });
       this.$store.commit("saveUser", resp.data.user);
       this.$router.replace("/main").catch(() => {});
+      this.$store.commit("saveNotApprovedTeams", res.data.notApprovedTeams);
     },
     loginFail(msg = "") {
       this.$message({
