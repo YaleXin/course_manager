@@ -48,7 +48,7 @@ export default {
         if (!Number.isInteger(value)) {
           callback(new Error("请输入数字值"));
         } else {
-          if (value < 18) {
+          if (value < 0) {
             callback(new Error("必须非负"));
           } else {
             callback();

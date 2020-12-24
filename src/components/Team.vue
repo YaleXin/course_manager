@@ -53,6 +53,31 @@
         >
       </el-form-item>
     </el-form>
+
+    <el-table :data="notApprovedTeams" stripe style="width: 100%">
+      <el-table-column prop="subName" label="题目名称" width="180">
+      </el-table-column>
+      <el-table-column prop="captain" label="组长" width="180">
+      </el-table-column>
+      <el-table-column prop="member1" label="组员一"> </el-table-column>
+      <el-table-column prop="member2" label="组员二"> </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button
+            type="success"
+            @click="accept(notApprovedTeams[scope.$index].id, scope.$index)"
+            plain
+            >通过申请</el-button
+          >
+          <el-button
+            type="danger"
+            @click="reject(notApprovedTeams[scope.$index].id, scope.$index)"
+            plain
+            >拒绝申请</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 <script>
@@ -69,6 +94,12 @@ export default {
           href: "/subject",
         },
       },
+      // notApprovedTeams: [{
+      // captain: "",
+      // member1: "",
+      // subName: "",
+      // id: "",
+      // }],
       form: {
         student: [],
         subject: "",
@@ -95,7 +126,33 @@ export default {
       },
     };
   },
+  computed: {
+    notApprovedTeams() {
+      return this.$store.state.notApprovedTeams;
+    },
+    // notApprovedTeams: [{
+    // captain: "",
+    // member1: "",
+    // subName: "",
+    // id: "",
+    // }],
+  },
   created() {
+    if (this.$store.state.user.birthday === undefined) {
+      this.$axios
+        .post("/getNotApprovedTeams.te", {
+          data: {
+            teacherId: this.$store.state.user.id,
+          },
+        })
+        .then((resp) => {
+          this.$store.commit(
+            "saveNotApprovedTeams",
+            resp.data.notApprovedTeams
+          );
+        });
+    }
+
     this.$axios.all([this.getAllStudents(), this.getAllSubjects()]).then(
       this.$axios.spread((stResp, suResp) => {
         // 两个请求现在都执行完成
@@ -124,18 +181,40 @@ export default {
       console.log("prog_click");
       this.$router.replace("/progress").catch((err) => {});
     },
-    addTeam(){
-      this.$axios.put('/addTeam.st', {
-        data: {
-          subject: this.form.subject,
-          captain: this.$store.state.user.id,
-          members: this.form.student,
-        }
-      }).then(resp => {
-        console.log("tijap");
-      }).catch(e => {
-        console.log(e);
-      })
+    applySuccess() {
+      this.$message({
+        message: "提交成功！",
+        showClose: true,
+        type: "success",
+      });
+    },
+    applyFail() {
+      this.$message({
+        message: "提交失败",
+        showClose: true,
+        type: "error",
+      });
+    },
+    addTeam() {
+      this.$axios
+        .put("/addTeam.st", {
+          data: {
+            subject: this.form.subject,
+            captain: this.$store.state.user.id,
+            members: this.form.student,
+          },
+        })
+        .then((resp) => {
+          console.log(resp);
+          if (resp.data.addSuccess) {
+            this.applySuccess();
+          }else{
+            this.applyFail();
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     onSubmit(form) {
       this.$refs[form].validate((valid) => {
@@ -146,6 +225,62 @@ export default {
           return false;
         }
       });
+    },
+    success(index) {
+      this.$store.commit("removeOneNotApprovedTeam", index);
+      this.$message({
+        message: "操作成功",
+        showClose: true,
+        type: "success",
+      });
+    },
+    fail() {
+      this.$message({
+        message: "操作失败，系统内部出现问题",
+        showClose: true,
+        type: "error",
+      });
+    },
+    accept(teamId, index) {
+      this.$axios
+        .post("/acceptTeam.te", {
+          data: {
+            teamId: teamId,
+          },
+        })
+        .then((resp) => {
+          if (resp.data.success) {
+            this.success(index);
+          } else {
+            this.fail();
+          }
+        })
+        .catch((e) => {
+          this.fail();
+        });
+    },
+    reject(teamId, index) {
+      console.log('index=' + index);
+      this.$axios
+        .delete("/rejectTeam.te", {
+          data: {
+            // teamId: teamId,
+            data: {
+              teamId: teamId,
+            }
+          },
+        })
+        .then((resp) => {
+          if (resp.data.success === true) {
+            this.success(index);
+          } else {
+            // this.fail();
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          this.fail();
+        });
     },
   },
 };

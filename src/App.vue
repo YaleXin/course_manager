@@ -34,13 +34,9 @@ export default {
       .then((res) => {
         console.log(res);
         if (res.data.logined) {
-          console.log(res.data.user.birthday);
           this.$store.commit("saveUser", res.data.user);
           if (res.data.hasTeam) {
             this.$store.commit("saveTeam", res.data.team);
-            console.log(res.data.team);
-            console.log("uvex");
-            console.log(this.$store.state.team);
           }
           this.$store.commit("saveNotApprovedTeams", res.data.notApprovedTeams);
         }

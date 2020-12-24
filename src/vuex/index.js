@@ -66,8 +66,11 @@ const store = new Vuex.Store({
       state.adminLogin = true;
     },
     saveNotApprovedTeams(state, notApprovedTeams){
-      this.notApprovedTeams = notApprovedTeams;
+      state.notApprovedTeams = notApprovedTeams;
     },
+    removeOneNotApprovedTeam(state, index){
+      state.notApprovedTeams.splice(index, 1);
+    }
   }
 })
 
