@@ -5,21 +5,14 @@
       <el-timeline-item
         timestamp="2018/4/12"
         placement="top"
-        v-for="(item, index) in commits"
+        v-for="(item, index) in progresses"
         :key="index"
       >
         <el-card>
-          <h4>{{ item.description }}</h4>
-          <p>{{ item.submitter }} 提交于 {{ item.submitTime }}</p>
+          <h4>{{ item.content }}</h4>
+          <p>{{ item.uploader }} 提交于 {{ timeStamp2date(item.date) }}</p>
         </el-card>
       </el-timeline-item>
-
-      <!-- <el-timeline-item timestamp="2018/4/12" placement="top">
-        <el-card>
-          <h4>更新 Github 模板</h4>
-          <p>王小虎 提交于 2018/4/12 20:46</p>
-        </el-card>
-      </el-timeline-item> -->
     </el-timeline>
   </div>
 </template>
@@ -47,10 +40,34 @@ export default {
           submitTime: "2020/12/12 20:46",
         },
       ],
+      progresses: [
+        {
+          uploader: "",
+          content: "",
+          date: "",
+
+        }
+      ],
     };
   },
   mounted() {},
-  methods: {},
+  methods: {
+    timeStamp2date(timeStamp){
+      const date = new Date(timeStamp);
+      return date.toLocaleDateString();
+    },
+  },
+  created() {
+    this.$axios.post("/getAllProgresses.te", {
+      data: {
+        teacherId: this.$store.state.user.id,
+      }
+    }).then(resp =>{
+      this.progresses = resp.data.progresses;
+    }).catch(e => {
+      console.log(e);
+    })
+  },
 };
 </script>
 
