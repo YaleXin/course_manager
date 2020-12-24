@@ -51,11 +51,32 @@ export default {
     };
   },
   created() {
-    console.log(this.$store.state.team);
+    this.$axios
+      .get("/getUserSession")
+      .then((res) => {
+        console.log(res);
+        if (res.data.logined) {
+          this.$store.commit("saveUser", res.data.user);
+          if (res.data.hasTeam) {
+            this.$store.commit("saveTeam", res.data.team);
+          }
+          this.$store.commit("saveNotApprovedTeams", res.data.notApprovedTeams);
+        }
+      })
+      .catch((error) => {
+        this.$message({
+          showClose: true,
+          message: "数据请求失败，请稍后再试",
+          type: "error",
+        });
+      });
     const teamId = this.$store.state.team.id;
     const studentId = this.$store.state.user.id;
-    console.log(teamId);
-    this.upUrl = "/testJson4servlet/upload.st?teamId=" + teamId + "&studentId=" + studentId;
+    this.upUrl =
+      "/testJson4servlet/upload.st?teamId=" +
+      teamId +
+      "&studentId=" +
+      studentId;
   },
   mounted() {
     this.student = this.$store.state.user.id;
