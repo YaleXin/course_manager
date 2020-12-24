@@ -3,10 +3,9 @@
     <el-row type="flex" class="row-bg" justify="center">
       <el-col :span="6">
         <el-upload
-          class="upload-demo"
           ref="upload"
           :drag="true"
-          action="/testJson4servlet/progressUploadFile"
+          :action="upUrl"
           :on-success="success"
           :on-error="error"
           :on-preview="handlePreview"
@@ -16,6 +15,7 @@
           :limit="1"
           :on-exceed="exceed"
           :before-remove="beforeRemove"
+          :data="myData"
           accept=".doc, .docx"
         >
           <el-button slot="trigger" size="small" type="primary"
@@ -28,7 +28,9 @@
             @click="submitUpload"
             >上传到服务器</el-button
           >
-          <div slot="tip" class="el-upload__tip">只能上传doc/docx文件，且不超过500kb</div>
+          <div slot="tip" class="el-upload__tip">
+            只能上传doc/docx文件，且不超过500kb
+          </div>
         </el-upload>
       </el-col>
     </el-row>
@@ -41,9 +43,23 @@ export default {
   data() {
     return {
       fileList: [],
+      myData: {
+        teamId: -1,
+        student: -1,
+      },
+      upUrl: "",
     };
   },
-  mounted() {},
+  created() {
+    const teamId = this.$store.state.team.id;
+    console.log(teamId);
+    this.upUrl = "/testJson4servlet/upload.st?teamId=" + teamId;
+  },
+  mounted() {
+    this.student = this.$store.state.user.id;
+    console.log(this.$store.state.user.id);
+  },
+  computed: {},
   methods: {
     submitUpload() {
       this.$refs.upload.submit();
