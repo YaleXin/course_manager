@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div class="teamInfo" v-if="isStudent">
+    <div class="teamInfo" v-if="isStudent && hasTeam">
       <div>
         <span>队长：</span>
         <span class="captain">{{ team.captain }}</span>
@@ -21,7 +21,12 @@
       </div>
     </div>
 
-    <el-form ref="form" :model="form" :rules="rules" v-if="isStudent">
+    <el-form
+      ref="form"
+      :model="form"
+      :rules="rules"
+      v-if="isStudent && !hasTeam"
+    >
       <el-form-item label="作为队长，请选择您的队员：">
         <el-select
           v-model="form.student"
@@ -94,12 +99,17 @@
         </el-table-column>
         <el-table-column prop="member1" label="组员一"> </el-table-column>
         <el-table-column prop="member2" label="组员二"> </el-table-column>
-        <el-table-column label="操作"> 
+        <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-input-number v-model="scope.row.score"  :min="0" :max="100" ></el-input-number> 
-           <el-button type="success" plain @click="trySetScore(scope.$index)">确定打分</el-button>
+            <el-input-number
+              v-model="scope.row.score"
+              :min="0"
+              :max="100"
+            ></el-input-number>
+            <el-button type="success" plain @click="trySetScore(scope.$index)"
+              >确定打分</el-button
+            >
           </template>
-          
         </el-table-column>
       </el-table>
       <el-row type="flex" justify="center">
@@ -126,6 +136,7 @@ export default {
       num1: 0,
       isTeacher: null,
       isStudent: null,
+      hasTeam: false,
       team: {
         captain: "郝家旺",
         members: ["黄瑞信", "葛忠灿"],
@@ -181,38 +192,44 @@ export default {
         //   subName: "",
         // }
       ],
+      notApprovedTeams: [
+        // {
+        //   captain: "",
+        //   member1: "",
+        //   subName: "",
+        //   id: "",
+        // },
+      ],
     };
   },
   computed: {
-    notApprovedTeams() {
-      return this.$store.state.notApprovedTeams;
-    },
-    // notApprovedTeams: [{
-    // captain: "",
-    // member1: "",
-    // subName: "",
-    // id: "",
-    // }],
+    // notApprovedTeams() {
+    //   return this.$store.state.notApprovedTeams;
+    // },
+    // notApprovedTeams: [
+    // {
+    //   captain: "",
+    //   member1: "",
+    //   subName: "",
+    //   id: "",
+    // },
+    // ],
   },
   created() {
-    if (this.$store.state.user.role === "teacher") {
+    const user = this.$store.state.user;
+    if (user.role === "teacher") {
       this.isTeacher = true;
-      this.$axios
-        .post("/getNotApprovedTeams.te", {
-          data: {
-            teacherId: this.$store.state.user.id,
-          },
-        })
-        .then((resp) => {
-          this.$store.commit(
-            "saveNotApprovedTeams",
-            resp.data.notApprovedTeams
-          );
-        });
+      this.getNotApprovedTeams();
       this.getHasScore();
       this.getHasNoScoreTeams();
-    } else if (this.$store.state.user.role === "student") {
-      (this.isStudent = true),
+    } else if (user.role === "student") {
+      this.isStudent = true;
+      console.log(user);
+      if(user.team === undefined){
+        this.hasTeam = false;
+      }else{
+        this.hasTeam = true;
+      }
         // 用于学生创建团队
         this.$axios.all([this.getAllStudents(), this.getAllSubjects()]).then(
           this.$axios.spread((stResp, suResp) => {
@@ -229,24 +246,27 @@ export default {
   },
   mounted() {},
   methods: {
-    setSocre(index){
+    setSocre(index) {
       console.log(this.hasNoScoreTeams[index]);
-      this.$axios.post("/setScore.te", {
-        data: {
-          teamId: this.hasNoScoreTeams[index].id,
-        }
-      }).then(resp => {
-        if(resp.data.setScore){
-          this.setSocreSuccess(index);
-        }else {
+      this.$axios
+        .post("/setScore.te", {
+          data: {
+            teamId: this.hasNoScoreTeams[index].id,
+          },
+        })
+        .then((resp) => {
+          if (resp.data.setScore) {
+            this.setSocreSuccess(index);
+          } else {
+            this.setSocreFail();
+          }
+        })
+        .catch((e) => {
+          console.log(e);
           this.setSocreFail();
-        }
-      }).catch(e => {
-        console.log(e);
-        this.setSocreFail();
-      })
+        });
     },
-    setSocreSuccess(index){
+    setSocreSuccess(index) {
       this.$message({
         message: "设置成功",
         showClose: true,
@@ -254,24 +274,25 @@ export default {
       });
       const team = this.hasNoScoreTeams[index];
       this.hasNoScoreTeams.splice(index, 1);
-      this.hasScoreTeams.splice(index, 0,team);
+      this.hasScoreTeams.splice(index, 0, team);
     },
-    setSocreFail(error){
+    setSocreFail(error) {
       this.$message({
         message: "设置失败 原因：" + error,
         showClose: true,
         type: "error",
-      })
+      });
     },
-    trySetScore(index){
-      this.$confirm('此操作将代表您已经确认该组的分数, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+    trySetScore(index) {
+      this.$confirm("此操作将代表您已经确认该组的分数, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
           this.setSocre(index);
-        }).catch(() => {          
-        });
+        })
+        .catch(() => {});
     },
     getAllStudents() {
       return this.$axios.get("/getAllStudents.st");
@@ -293,6 +314,8 @@ export default {
         showClose: true,
         type: "success",
       });
+      this.hasTeam = true;
+      this.$store.commit("changeUserTeamStatus");
     },
     applyFail() {
       this.$message({
@@ -332,15 +355,17 @@ export default {
         }
       });
     },
-    success(index) {
-      this.$store.commit("removeOneNotApprovedTeam", index);
+    approveSuccess(index) {
       this.$message({
         message: "操作成功",
         showClose: true,
         type: "success",
       });
+      const team = this.notApprovedTeams[index];
+      this.hasNoScoreTeams.splice(index, 0, team);
+      this.notApprovedTeams.splice(index, 1);
     },
-    fail() {
+    approveFail() {
       this.$message({
         message: "操作失败，系统内部出现问题",
         showClose: true,
@@ -356,9 +381,9 @@ export default {
         })
         .then((resp) => {
           if (resp.data.success) {
-            this.success(index);
+            this.approveSuccess(index);
           } else {
-            this.fail();
+            this.approveFail();
           }
         })
         .catch((e) => {
@@ -410,6 +435,20 @@ export default {
         })
         .then((resp) => {
           this.hasNoScoreTeams = resp.data.hasNoScoreTeams;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    getNotApprovedTeams() {
+      this.$axios
+        .post("/getNotApprovedTeams.te", {
+          data: {
+            teacherId: this.$store.state.user.id,
+          },
+        })
+        .then((resp) => {
+          this.notApprovedTeams = resp.data.notApprovedTeams;
         })
         .catch((e) => {
           console.log(e);

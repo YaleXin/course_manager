@@ -32,14 +32,12 @@ export default {
     this.$axios
       .get("/getUserSession")
       .then((res) => {
-        console.log(res);
         if (res.data.logined) {
           this.$store.commit("saveUser", res.data.user);
           console.log(res.data.user);
           if (res.data.hasTeam) {
             this.$store.commit("saveTeam", res.data.team);
           }
-          this.$store.commit("saveNotApprovedTeams", res.data.notApprovedTeams);
         }
       })
       .catch((error) => {

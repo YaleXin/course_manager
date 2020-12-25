@@ -60,7 +60,6 @@ export default {
           if (res.data.hasTeam) {
             this.$store.commit("saveTeam", res.data.team);
           }
-          this.$store.commit("saveNotApprovedTeams", res.data.notApprovedTeams);
         }
       })
       .catch((error) => {
