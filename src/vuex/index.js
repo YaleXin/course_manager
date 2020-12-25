@@ -60,6 +60,9 @@ const store = new Vuex.Store({
     changeUserTeamStatus(state){
       state.user.team = {}
     },
+    afterApplySaveTeam(state, team){
+      state.user.team = team;
+    },
   }
 })
 

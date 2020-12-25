@@ -94,6 +94,7 @@ export default {
         showClose: true,
         type: "success",
       });
+      console.log(resp.data.user);
       console.log(resp.data.user.team);
       this.$store.commit("saveUser", resp.data.user);
       this.$router.replace("/main").catch(() => {});
@@ -136,7 +137,7 @@ export default {
             })
             .catch((error) => {
               // console.log('error');
-              // this.loginFail();
+               this.loginFail();
             });
         } else {
           console.log("error submit!!");

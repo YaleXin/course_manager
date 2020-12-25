@@ -87,14 +87,14 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    loginSuccess(resp) {
+    addSuccess(resp) {
       this.$message({
         message: "添加成功",
         showClose: true,
         type: "success",
       });
     },
-    loginFail(mess = "") {
+    addFail(mess = "") {
       this.$message({
         showClose: true,
         message: mess + " 添加失败，请稍后再试",
@@ -112,15 +112,15 @@ export default {
         .then((resp) => {
           console.log(resp);
           if (resp.data.addSuccess == false) {
-            this.loginFail(resp.data.error);
+            this.addFail(resp.data.error);
           } else {
-            this.loginSuccess(resp);
+            this.addSuccess(resp);
             this.resetForm(formName);
           }
         })
         .catch((error) => {
           console.log(error);
-          this.loginFail();
+          this.addFail();
         });
     },
   },

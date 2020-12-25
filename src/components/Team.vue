@@ -7,13 +7,22 @@
       </div>
       <div>
         <span>队员：</span>
-        <span v-for="(m, index) in team.members" :key="index">{{ m }} </span>
+        <span>{{team.member1}}</span>
+        <span>{{team.member2}}</span>
       </div>
       <div>
         题目：
         <el-link type="primary" @click.native="desc_click">{{
-          team.subject.description
+          team.subName
         }}</el-link>
+      </div>
+      <div>
+        <span>审核情况：</span>
+        <span>{{team.approved?"已通过":"未通过"}}</span>
+      </div>
+      <div>
+        <span>分数：</span>
+        <span>{{team.scored ?team.score : "暂无"}}</span>
       </div>
       <div>
         进展：
@@ -103,7 +112,7 @@
           <template slot-scope="scope">
             <el-input-number
               v-model="scope.row.score"
-              :min="0"
+              :min="1"
               :max="100"
             ></el-input-number>
             <el-button type="success" plain @click="trySetScore(scope.$index)"
@@ -133,17 +142,16 @@ export default {
   components: {},
   data() {
     return {
-      num1: 0,
+      num1: 1,
       isTeacher: null,
       isStudent: null,
       hasTeam: false,
       team: {
-        captain: "郝家旺",
-        members: ["黄瑞信", "葛忠灿"],
-        subject: {
-          description: "题目简述",
-          href: "/subject",
-        },
+        // captain: "",
+        // member1: "",
+        // member2: "",
+        // subName: ""
+        // approved: false
       },
       // notApprovedTeams: [{
       // captain: "",
@@ -225,6 +233,7 @@ export default {
     } else if (user.role === "student") {
       this.isStudent = true;
       console.log(user);
+      this.team = user.team;
       if (user.team === undefined) {
         this.hasTeam = false;
         this.getData4CreateTeam();
@@ -241,6 +250,7 @@ export default {
         .post("/setScore.te", {
           data: {
             teamId: this.hasNoScoreTeams[index].id,
+            score: this.hasNoScoreTeams[index].score,
           },
         })
         .then((resp) => {
@@ -326,6 +336,8 @@ export default {
           console.log(resp);
           if (resp.data.addSuccess) {
             this.applySuccess();
+            this.$store.commit("afterApplySaveTeam", resp.data.team);
+            this.team = resp.data.team;
           } else {
             this.applyFail();
           }

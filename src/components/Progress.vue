@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <my-upload v-if="isStudent"></my-upload>
+    <my-upload v-if="isStudent && isApproved && !isScored"></my-upload>
     <el-timeline>
       <el-timeline-item
         placement="top"
@@ -45,6 +45,8 @@ export default {
       queryData: {},
       filename: "",
       isStudent: false,
+      isApproved: false,
+      isScored: true,
     };
   },
   mounted() {},
@@ -94,7 +96,13 @@ export default {
     let url = "";
     this.queryData = {};
     if (role === "student") {
-      this.isStudent = true,
+      this.isStudent = true;
+      if(this.$store.state.user.team.approved === true){
+        this.isApproved = true;
+      }
+      if(this.$store.state.user.team.score == 0){
+        this.isScored = false;
+      }
       url = "/getAllProgresses.st";
       this.queryData = {
         teamId: this.$store.state.team.id,
