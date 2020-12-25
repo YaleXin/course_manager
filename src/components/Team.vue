@@ -94,7 +94,13 @@
         </el-table-column>
         <el-table-column prop="member1" label="组员一"> </el-table-column>
         <el-table-column prop="member2" label="组员二"> </el-table-column>
-        <el-table-column label="操作"> </el-table-column>
+        <el-table-column label="操作"> 
+          <template slot-scope="scope">
+            <el-input-number v-model="scope.row.score"  :min="0" :max="100" ></el-input-number> 
+           <el-button type="success" plain @click="trySetScore(scope.$index)">确定打分</el-button>
+          </template>
+          
+        </el-table-column>
       </el-table>
       <el-row type="flex" justify="center">
         <h3>已评分团队</h3>
@@ -117,6 +123,7 @@ export default {
   components: {},
   data() {
     return {
+      num1: 0,
       isTeacher: null,
       isStudent: null,
       team: {
@@ -190,7 +197,6 @@ export default {
   created() {
     if (this.$store.state.user.role === "teacher") {
       this.isTeacher = true;
-
       this.$axios
         .post("/getNotApprovedTeams.te", {
           data: {
@@ -223,6 +229,50 @@ export default {
   },
   mounted() {},
   methods: {
+    setSocre(index){
+      console.log(this.hasNoScoreTeams[index]);
+      this.$axios.post("/setScore.te", {
+        data: {
+          teamId: this.hasNoScoreTeams[index].id,
+        }
+      }).then(resp => {
+        if(resp.data.setScore){
+          this.setSocreSuccess(index);
+        }else {
+          this.setSocreFail();
+        }
+      }).catch(e => {
+        console.log(e);
+        this.setSocreFail();
+      })
+    },
+    setSocreSuccess(index){
+      this.$message({
+        message: "设置成功",
+        showClose: true,
+        type: "success",
+      });
+      const team = this.hasNoScoreTeams[index];
+      this.hasNoScoreTeams.splice(index, 1);
+      this.hasScoreTeams.splice(index, 0,team);
+    },
+    setSocreFail(error){
+      this.$message({
+        message: "设置失败 原因：" + error,
+        showClose: true,
+        type: "error",
+      })
+    },
+    trySetScore(index){
+      this.$confirm('此操作将代表您已经确认该组的分数, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.setSocre(index);
+        }).catch(() => {          
+        });
+    },
     getAllStudents() {
       return this.$axios.get("/getAllStudents.st");
     },
