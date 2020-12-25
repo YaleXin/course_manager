@@ -24,7 +24,7 @@
       <el-table-column prop="finished" label="完成人数"> </el-table-column>
       <el-table-column prop="teacherName" label="题目提供者"> </el-table-column>
     </el-table>
-    <el-button type="success" @click="tryAddSubject" plain id="add-btn"
+    <el-button v-if="isTeacher" type="success" @click="tryAddSubject" plain id="add-btn"
       >添加题目</el-button
     >
     <el-dialog
@@ -49,6 +49,7 @@ export default {
   components: {},
   data() {
     return {
+      isTeacher: false,
       showMsg: true,
       programs: [
         { descr: "题目一", selectNum: 10, finished: 5, copyright: "黄阿信" },
@@ -86,6 +87,11 @@ export default {
     },
   },
   created() {
+
+    if(this.$store.state.user.role === "teacher"){
+      this.isTeacher = true;
+    }
+
     this.$axios
       .get("/getAllSubject")
       .then((resp) => {

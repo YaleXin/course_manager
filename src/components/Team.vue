@@ -225,23 +225,12 @@ export default {
     } else if (user.role === "student") {
       this.isStudent = true;
       console.log(user);
-      if(user.team === undefined){
+      if (user.team === undefined) {
         this.hasTeam = false;
-      }else{
+        this.getData4CreateTeam();
+      } else {
         this.hasTeam = true;
       }
-        // 用于学生创建团队
-        this.$axios.all([this.getAllStudents(), this.getAllSubjects()]).then(
-          this.$axios.spread((stResp, suResp) => {
-            // 两个请求现在都执行完成
-            this.subjects = suResp.data.subjects;
-            this.students = stResp.data.students;
-            const id = this.$store.state.user.id;
-            this.students = stResp.data.students.filter((item) => {
-              return item.id !== id;
-            });
-          })
-        );
     }
   },
   mounted() {},
@@ -295,7 +284,7 @@ export default {
         .catch(() => {});
     },
     getAllStudents() {
-      return this.$axios.get("/getAllStudents.st");
+      return this.$axios.get("/getAllHasNoTeamStudents.st");
     },
     getAllSubjects() {
       return this.$axios.get("/getAllSubject");
@@ -453,6 +442,20 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+    getData4CreateTeam() {
+      // 用于学生创建团队
+      this.$axios.all([this.getAllStudents(), this.getAllSubjects()]).then(
+        this.$axios.spread((stResp, suResp) => {
+          // 两个请求现在都执行完成
+          this.subjects = suResp.data.subjects;
+          this.students = stResp.data.students;
+          const id = this.$store.state.user.id;
+          this.students = stResp.data.students.filter((item) => {
+            return item.id !== id;
+          });
+        })
+      );
     },
   },
 };
