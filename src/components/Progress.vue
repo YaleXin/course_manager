@@ -3,7 +3,7 @@
     <my-upload></my-upload>
     <el-timeline>
       <el-timeline-item
-        timestamp="2018/4/12"
+        timestamp="2020/12/20"
         placement="top"
         v-for="(item, index) in progresses"
         :key="index"
@@ -23,50 +23,51 @@ export default {
   components: { MyUpload },
   data() {
     return {
-      commits: [
-        {
-          submitter: "黄阿信",
-          description: "第一次提交",
-          submitTime: "2020/12/10 20:46",
-        },
-        {
-          submitter: "yalexin",
-          description: "第二次提交",
-          submitTime: "2020/12/11 20:46",
-        },
-        {
-          submitter: "阿信",
-          description: "第三次提交",
-          submitTime: "2020/12/12 20:46",
-        },
-      ],
       progresses: [
-        {
-          uploader: "",
-          content: "",
-          date: "",
-
-        }
+        // {
+        // uploader: "",
+        // content: "",
+        // date: "",
+        // }
       ],
+      queryData: {},
     };
   },
   mounted() {},
   methods: {
-    timeStamp2date(timeStamp){
+    timeStamp2date(timeStamp) {
       const date = new Date(timeStamp);
       return date.toLocaleDateString();
     },
   },
   created() {
-    this.$axios.post("/getAllProgresses.te", {
-      data: {
+    const role = this.$store.state.user.role;
+    let url = "";
+    this.queryData = {};
+    if (role === "student") {
+      url = "/getAllProgresses.st";
+      this.queryData = {
+        teamId: this.$store.state.team.id,
+      };
+    } else if (role === "teacher") {
+      url = "/getAllProgresses.te";
+      this.queryData = {
         teacherId: this.$store.state.user.id,
-      }
-    }).then(resp =>{
-      this.progresses = resp.data.progresses;
-    }).catch(e => {
-      console.log(e);
-    })
+      };
+    }
+    if (role !== undefined) {
+      this.$axios
+        .post(url, {
+          data: this.queryData,
+        })
+        .then((resp) => {
+          this.progresses = resp.data.progresses;
+          console.log(resp);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   },
 };
 </script>

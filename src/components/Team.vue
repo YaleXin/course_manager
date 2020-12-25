@@ -264,7 +264,6 @@ export default {
       this.$axios
         .delete("/rejectTeam.te", {
           data: {
-            // teamId: teamId,
             data: {
               teamId: teamId,
             }
