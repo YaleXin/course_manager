@@ -3,13 +3,25 @@
     <my-upload></my-upload>
     <el-timeline>
       <el-timeline-item
-        timestamp="2020/12/20"
         placement="top"
         v-for="(item, index) in progresses"
         :key="index"
       >
         <el-card>
-          <h4>{{ item.content }}</h4>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="点击下载"
+            placement="top"
+          >
+            <span
+              class="uploaderClass"
+              style="widtd: auto"
+              @click="download(item.content)"
+              >{{ item.content }}</span
+            >
+          </el-tooltip>
+
           <p>{{ item.uploader }} 提交于 {{ timeStamp2date(item.date) }}</p>
         </el-card>
       </el-timeline-item>
@@ -31,6 +43,7 @@ export default {
         // }
       ],
       queryData: {},
+      filename: "",
     };
   },
   mounted() {},
@@ -38,6 +51,41 @@ export default {
     timeStamp2date(timeStamp) {
       const date = new Date(timeStamp);
       return date.toLocaleDateString();
+    },
+    download(filename) {
+      if (this.$store.state.user.role !== undefined) {
+        (this.filename = filename),
+          this.$axios
+            .post("/download.user", {
+              data: {
+                fileName: this.filename,
+              },
+            }, {responseType: 'blob'})
+            .then((res) => {
+              console.log(res);
+              const { data, headers } = res;
+              const fileName = headers["content-disposition"].replace(
+                /\w+;filename=(.*)/,
+                "$1"
+              );
+              const blob = new Blob([data], { type: headers["content-type"] });
+              let dom = document.createElement("a");
+              let url = window.URL.createObjectURL(blob);
+              dom.href = url;
+              dom.download = decodeURI(fileName);
+              dom.style.display = "none";
+              document.body.appendChild(dom);
+              dom.click();
+              dom.parentNode.removeChild(dom);
+              window.URL.revokeObjectURL(url);
+            });
+      } else {
+        this.$message({
+          message: "您不可以下载",
+          showClose: true,
+          type: "error",
+        });
+      }
     },
   },
   created() {
@@ -72,4 +120,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.uploaderClass {
+  font-weight: bolder !important;
+}
+</style>
