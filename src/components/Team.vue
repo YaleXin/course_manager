@@ -1,25 +1,27 @@
 <template>
   <div class="">
-    <div>
-      <span>队长：</span>
-      <span class="captain">{{ team.captain }}</span>
-    </div>
-    <div>
-      <span>队员：</span>
-      <span v-for="(m, index) in team.members" :key="index">{{ m }} </span>
-    </div>
-    <div>
-      题目：
-      <el-link type="primary" @click.native="desc_click">{{
-        team.subject.description
-      }}</el-link>
-    </div>
-    <div>
-      进展：
-      <el-link type="primary" @click.native="prog_click">请移步</el-link>
+    <div class="teamInfo" v-if="isStudent">
+      <div>
+        <span>队长：</span>
+        <span class="captain">{{ team.captain }}</span>
+      </div>
+      <div>
+        <span>队员：</span>
+        <span v-for="(m, index) in team.members" :key="index">{{ m }} </span>
+      </div>
+      <div>
+        题目：
+        <el-link type="primary" @click.native="desc_click">{{
+          team.subject.description
+        }}</el-link>
+      </div>
+      <div>
+        进展：
+        <el-link type="primary" @click.native="prog_click">请移步</el-link>
+      </div>
     </div>
 
-    <el-form ref="form" :model="form" :rules="rules">
+    <el-form ref="form" :model="form" :rules="rules" v-if="isStudent">
       <el-form-item label="作为队长，请选择您的队员：">
         <el-select
           v-model="form.student"
@@ -54,30 +56,59 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="notApprovedTeams" stripe style="width: 100%">
-      <el-table-column prop="subName" label="题目名称" width="180">
-      </el-table-column>
-      <el-table-column prop="captain" label="组长" width="180">
-      </el-table-column>
-      <el-table-column prop="member1" label="组员一"> </el-table-column>
-      <el-table-column prop="member2" label="组员二"> </el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <el-button
-            type="success"
-            @click="accept(notApprovedTeams[scope.$index].id, scope.$index)"
-            plain
-            >通过申请</el-button
-          >
-          <el-button
-            type="danger"
-            @click="reject(notApprovedTeams[scope.$index].id, scope.$index)"
-            plain
-            >拒绝申请</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
+    <div v-if="isTeacher">
+      <el-row type="flex" justify="center">
+        <h3>请审核团队</h3>
+      </el-row>
+      <el-table border :data="notApprovedTeams" stripe style="width: 100%">
+        <el-table-column prop="subName" label="题目名称" width="180">
+        </el-table-column>
+        <el-table-column prop="captain" label="组长" width="180">
+        </el-table-column>
+        <el-table-column prop="member1" label="组员一"> </el-table-column>
+        <el-table-column prop="member2" label="组员二"> </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              type="success"
+              @click="accept(notApprovedTeams[scope.$index].id, scope.$index)"
+              plain
+              >通过申请</el-button
+            >
+            <el-button
+              type="danger"
+              @click="reject(notApprovedTeams[scope.$index].id, scope.$index)"
+              plain
+              >拒绝申请</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-row type="flex" justify="center">
+        <h3>请评分</h3>
+      </el-row>
+      <el-table border :data="hasNoScoreTeams" stripe style="width: 100%">
+        <el-table-column prop="subName" label="题目名称" width="180">
+        </el-table-column>
+        <el-table-column prop="captain" label="组长" width="180">
+        </el-table-column>
+        <el-table-column prop="member1" label="组员一"> </el-table-column>
+        <el-table-column prop="member2" label="组员二"> </el-table-column>
+        <el-table-column label="操作"> </el-table-column>
+      </el-table>
+      <el-row type="flex" justify="center">
+        <h3>已评分团队</h3>
+      </el-row>
+      <el-table border :data="hasScoreTeams" stripe style="width: 100%">
+        <el-table-column prop="subName" label="题目名称" width="180">
+        </el-table-column>
+        <el-table-column prop="captain" label="组长" width="180">
+        </el-table-column>
+        <el-table-column prop="member1" label="组员一"> </el-table-column>
+        <el-table-column prop="member2" label="组员二"> </el-table-column>
+        <el-table-column prop="score" label="分数"> </el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 <script>
@@ -86,6 +117,8 @@ export default {
   components: {},
   data() {
     return {
+      isTeacher: null,
+      isStudent: null,
       team: {
         captain: "郝家旺",
         members: ["黄瑞信", "葛忠灿"],
@@ -124,6 +157,23 @@ export default {
       rules: {
         subject: [{ required: true, message: "请选择题目", trigger: "change" }],
       },
+      hasScoreTeams: [
+        // {
+        //   captain: "",
+        //   member1: "",
+        //   member2: "",
+        //   subName: "",
+        //   score: -1,
+        // }
+      ],
+      hasNoScoreTeams: [
+        // {
+        //   captain: "",
+        //   member1: "",
+        //   member2: "",
+        //   subName: "",
+        // }
+      ],
     };
   },
   computed: {
@@ -138,7 +188,9 @@ export default {
     // }],
   },
   created() {
-    if (this.$store.state.user.birthday === undefined) {
+    if (this.$store.state.user.role === "teacher") {
+      this.isTeacher = true;
+
       this.$axios
         .post("/getNotApprovedTeams.te", {
           data: {
@@ -151,19 +203,23 @@ export default {
             resp.data.notApprovedTeams
           );
         });
+      this.getHasScore();
+      this.getHasNoScoreTeams();
+    } else if (this.$store.state.user.role === "student") {
+      (this.isStudent = true),
+        // 用于学生创建团队
+        this.$axios.all([this.getAllStudents(), this.getAllSubjects()]).then(
+          this.$axios.spread((stResp, suResp) => {
+            // 两个请求现在都执行完成
+            this.subjects = suResp.data.subjects;
+            this.students = stResp.data.students;
+            const id = this.$store.state.user.id;
+            this.students = stResp.data.students.filter((item) => {
+              return item.id !== id;
+            });
+          })
+        );
     }
-
-    this.$axios.all([this.getAllStudents(), this.getAllSubjects()]).then(
-      this.$axios.spread((stResp, suResp) => {
-        // 两个请求现在都执行完成
-        this.subjects = suResp.data.subjects;
-        this.students = stResp.data.students;
-        const id = this.$store.state.user.id;
-        this.students = stResp.data.students.filter((item) => {
-          return item.id !== id;
-        });
-      })
-    );
   },
   mounted() {},
   methods: {
@@ -208,7 +264,7 @@ export default {
           console.log(resp);
           if (resp.data.addSuccess) {
             this.applySuccess();
-          }else{
+          } else {
             this.applyFail();
           }
         })
@@ -260,13 +316,13 @@ export default {
         });
     },
     reject(teamId, index) {
-      console.log('index=' + index);
+      console.log("index=" + index);
       this.$axios
         .delete("/rejectTeam.te", {
           data: {
             data: {
               teamId: teamId,
-            }
+            },
           },
         })
         .then((resp) => {
@@ -279,6 +335,34 @@ export default {
         .catch((e) => {
           console.log(e);
           this.fail();
+        });
+    },
+    getHasScore() {
+      this.$axios
+        .post("/getHasScoreTeams.te", {
+          data: {
+            teacherId: this.$store.state.user.id,
+          },
+        })
+        .then((resp) => {
+          this.hasScoreTeams = resp.data.hasScoreTeams;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    getHasNoScoreTeams() {
+      this.$axios
+        .post("/getHasNoScoreTeams.te", {
+          data: {
+            teacherId: this.$store.state.user.id,
+          },
+        })
+        .then((resp) => {
+          this.hasNoScoreTeams = resp.data.hasNoScoreTeams;
+        })
+        .catch((e) => {
+          console.log(e);
         });
     },
   },
